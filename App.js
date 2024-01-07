@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useEffect,useState} from "react";
+import { View, Text, Alert,ScrollView} from 'react-native';
+import apiClient from "./services/apiClient";
+import Style from './services/appStyle'
+import GameCard from "./components/GameCard";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+const App = () => {
+
+  const [games, setGames] = useState([]);
+
+  const loadData = () => {
+    apiClient.get('/games')
+    .then(res => {
+      setGames(res.data.results)
+    })
+    .catch(err => {
+      Alert.alert('Load Games', err.message)
+    })
+  }
+
+  useEffect(() => {
+    loadData();
+  },[])
+
+  return(
+    <>
+      <ScrollView>
+      <View style={Style.container}>
+        {
+          games.map(item => (
+            <GameCard item={item} />
+          ))
+        }
+      </View>
+      </ScrollView>
+    </>
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
